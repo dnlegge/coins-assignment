@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 
 public class ChangeGivingVendingMachine implements VendingMachine {
+
     private static final String COIN_INVENTORY_PROPERTIES = "coin-inventory.properties";
     private final String pathToInventory;
 
@@ -23,7 +24,7 @@ public class ChangeGivingVendingMachine implements VendingMachine {
         this.pathToInventory = pathToInventory;
 
         List<String> lines = Files.readAllLines(Paths.get(pathToInventory + File.separator + COIN_INVENTORY_PROPERTIES), StandardCharsets.UTF_8);
-        availableCoins = new HashMap<>();
+        this.availableCoins = new HashMap<>();
         for (String line : lines) {
             final String[] split = line.split("=");
             availableCoins.put(Coin.getByDemonination(split[0]), Integer.parseInt(split[1]));
@@ -44,6 +45,16 @@ public class ChangeGivingVendingMachine implements VendingMachine {
         return coins;
     }
 
+    private Coin selectLargestCoinPossible(int requiredAmount) {
+        final Coin[] values = Coin.values();
+        for (Coin coin : values) {
+            if (coin.getDenomination() <= requiredAmount) {
+                return coin;
+            }
+        }
+        return null;
+    }
+
     @Override
     public Collection<Coin> getChangeFor(int pence) {
         final ArrayList<Coin> coins = new ArrayList<>();
@@ -61,6 +72,24 @@ public class ChangeGivingVendingMachine implements VendingMachine {
     }
 
     private void writeOutAvailableCoinage() {
+        String fileContents = generateFileContents();
+
+        overwriteExistingFile(fileContents);
+    }
+
+    private void overwriteExistingFile(String fileContents) {
+        try {
+
+            File file = new File(pathToInventory, COIN_INVENTORY_PROPERTIES);
+            file.delete();
+
+            FileUtils.writeStringToFile(file, fileContents);
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing inventory file out: " + e.getMessage(), e);
+        }
+    }
+
+    private String generateFileContents() {
         StringBuilder fileContents = new StringBuilder();
         for (Coin coin : Coin.values()) {
             if (availableCoins.containsKey(coin)) {
@@ -71,26 +100,7 @@ public class ChangeGivingVendingMachine implements VendingMachine {
             }
 
         }
-
-        try {
-
-            File file = new File(pathToInventory, COIN_INVENTORY_PROPERTIES);
-            file.delete();
-
-            FileUtils.writeStringToFile(file, fileContents.toString());
-        } catch (IOException e) {
-            throw new RuntimeException("Error writing inventory file out: " + e.getMessage(), e);
-        }
-    }
-
-    private Coin selectLargestCoinPossible(int requiredAmount) {
-        final Coin[] values = Coin.values();
-        for (Coin coin : values) {
-            if (coin.getDenomination() <= requiredAmount) {
-                return coin;
-            }
-        }
-        return null;
+        return fileContents.toString();
     }
 
     private Coin selectLargestAvailableCoinPossible(int requiredAmount) {

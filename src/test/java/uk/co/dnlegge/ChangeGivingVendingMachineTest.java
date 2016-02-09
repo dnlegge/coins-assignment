@@ -3,6 +3,7 @@ package uk.co.dnlegge;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -14,7 +15,7 @@ import org.junit.Test;
 
 public class ChangeGivingVendingMachineTest {
 
-    private static final String PATH_TO_CLEAN = "./src/main/resources/";
+    private static final String PATH_TO_CLEAN = "./src/test/resources/";
     private static final String PATH_TO_TARGET = "./target/";
 
     private static final String COIN_INVENTORY_PROPERTIES = "coin-inventory.properties";
@@ -26,7 +27,7 @@ public class ChangeGivingVendingMachineTest {
         final File srcFile = new File(PATH_TO_CLEAN, COIN_INVENTORY_PROPERTIES);
         final File destFile = new File(PATH_TO_TARGET, COIN_INVENTORY_PROPERTIES);
         FileUtils.copyFile(srcFile, destFile);
-        beingTested = new ChangeGivingVendingMachine();
+        beingTested = new ChangeGivingVendingMachine(PATH_TO_TARGET);
     }
 
     @Test
@@ -80,9 +81,6 @@ public class ChangeGivingVendingMachineTest {
     @Test
     public void testGetOptimalChangeForDuffAmount() throws Exception {
 
-
-        beingTested = new ChangeGivingVendingMachine();
-
         final int testValue = -4;
         final Collection<Coin> result = beingTested.getOptimalChangeFor(testValue);
 
@@ -132,7 +130,7 @@ public class ChangeGivingVendingMachineTest {
 
         assertEquals(testValue, total);
         //actual 100p 100p 100p 100p 100p 100p 100p 50p 10p 10p 10p 10p 5p 2p 2p
-        assertEquals(82, result.size());
+        assertEquals(15, result.size());
 
     }
 
@@ -149,7 +147,12 @@ public class ChangeGivingVendingMachineTest {
 
         assertEquals(testValue, total);
         //actual 100p 100p 100p 100p 100p 100p 100p 100p 100p 100p 100p 50p 50p 50p 50p 50p 50p 50p 50p 50p 10p 10p 10p 10p 5p 2p 2p
-        assertEquals(234, result.size());
+        assertEquals(27, result.size());
+
+        final File expected = new File(PATH_TO_CLEAN, "expected-" + COIN_INVENTORY_PROPERTIES);
+        final File actual = new File(PATH_TO_TARGET, COIN_INVENTORY_PROPERTIES);
+
+        assertTrue(FileUtils.contentEquals(expected, actual));
 
     }
 

@@ -14,14 +14,15 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 
 public class ChangeGivingVendingMachine implements VendingMachine {
-    private static final String PATH_TO_DIR = "./target/";
-    //    private static final String PATH_TO_DIR = "./src/main/resources/";
     private static final String COIN_INVENTORY_PROPERTIES = "coin-inventory.properties";
+    private final String pathToInventory;
+
     private Map<Integer, Integer> availableCoins;
 
-    public ChangeGivingVendingMachine() throws IOException {
+    public ChangeGivingVendingMachine(String pathToInventory) throws IOException {
+        this.pathToInventory = pathToInventory;
 
-        List<String> lines = Files.readAllLines(Paths.get(PATH_TO_DIR + COIN_INVENTORY_PROPERTIES), StandardCharsets.UTF_8);
+        List<String> lines = Files.readAllLines(Paths.get(pathToInventory + File.separator + COIN_INVENTORY_PROPERTIES), StandardCharsets.UTF_8);
         availableCoins = new HashMap<>();
         for (String line : lines) {
             final String[] split = line.split("=");
@@ -73,7 +74,7 @@ public class ChangeGivingVendingMachine implements VendingMachine {
 
         try {
 
-            File file = new File(PATH_TO_DIR + COIN_INVENTORY_PROPERTIES);
+            File file = new File(pathToInventory, COIN_INVENTORY_PROPERTIES);
             file.delete();
 
             FileUtils.writeStringToFile(file, fileContents.toString());

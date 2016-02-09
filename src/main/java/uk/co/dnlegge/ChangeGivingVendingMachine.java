@@ -1,5 +1,6 @@
 package uk.co.dnlegge;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,14 +11,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ChangeGivingVendingMachine implements VendingMachine {
+import org.apache.commons.io.FileUtils;
 
+public class ChangeGivingVendingMachine implements VendingMachine {
+    private static final String PATH_TO_DIR = "./target/";
+    //    private static final String PATH_TO_DIR = "./src/main/resources/";
+    private static final String COIN_INVENTORY_PROPERTIES = "coin-inventory.properties";
     private Map<Integer, Integer> availableCoins;
 
     public ChangeGivingVendingMachine() throws IOException {
-        final String pathToDir = "./src/main/resources/";
 
-        List<String> lines = Files.readAllLines(Paths.get(pathToDir + "coin-inventory.properties"), StandardCharsets.UTF_8);
+        List<String> lines = Files.readAllLines(Paths.get(PATH_TO_DIR + COIN_INVENTORY_PROPERTIES), StandardCharsets.UTF_8);
         availableCoins = new HashMap<>();
         for (String line : lines) {
             final String[] split = line.split("=");
@@ -50,7 +54,32 @@ public class ChangeGivingVendingMachine implements VendingMachine {
             runningTotal += thisCoin.getDenomination();
         }
 
+        writeOutAvailableCoinage();
+
         return coins;
+    }
+
+    private void writeOutAvailableCoinage() {
+        StringBuilder fileContents = new StringBuilder();
+        for (Coin coin : Coin.values()) {
+            if (availableCoins.containsKey(coin.getDenomination())) {
+                fileContents.append(coin.getDenomination())
+                        .append("=")
+                        .append(availableCoins.get(coin.getDenomination()))
+                        .append("\n");
+            }
+
+        }
+
+        try {
+
+            File file = new File(PATH_TO_DIR + COIN_INVENTORY_PROPERTIES);
+            file.delete();
+
+            FileUtils.writeStringToFile(file, fileContents.toString());
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing inventory file out: " + e.getMessage(), e);
+        }
     }
 
     private Coin selectLargestCoinPossible(int requiredAmount) {

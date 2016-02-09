@@ -5,17 +5,27 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.util.Collection;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-public class InfiniteChangeGivingVendingMachineTest {
+public class ChangeGivingVendingMachineTest {
+
+    private static final String PATH_TO_CLEAN = "./src/main/resources/";
+    private static final String PATH_TO_TARGET = "./target/";
+
+    private static final String COIN_INVENTORY_PROPERTIES = "coin-inventory.properties";
 
     private ChangeGivingVendingMachine beingTested;
 
     @Before
     public void setUp() throws Exception {
+        final File srcFile = new File(PATH_TO_CLEAN, COIN_INVENTORY_PROPERTIES);
+        final File destFile = new File(PATH_TO_TARGET, COIN_INVENTORY_PROPERTIES);
+        FileUtils.copyFile(srcFile, destFile);
         beingTested = new ChangeGivingVendingMachine();
     }
 
@@ -122,7 +132,7 @@ public class InfiniteChangeGivingVendingMachineTest {
 
         assertEquals(testValue, total);
         //actual 100p 100p 100p 100p 100p 100p 100p 50p 10p 10p 10p 10p 5p 2p 2p
-        assertEquals(15, result.size());
+        assertEquals(82, result.size());
 
     }
 
@@ -139,7 +149,7 @@ public class InfiniteChangeGivingVendingMachineTest {
 
         assertEquals(testValue, total);
         //actual 100p 100p 100p 100p 100p 100p 100p 100p 100p 100p 100p 50p 50p 50p 50p 50p 50p 50p 50p 50p 10p 10p 10p 10p 5p 2p 2p
-        assertEquals(27, result.size());
+        assertEquals(234, result.size());
 
     }
 

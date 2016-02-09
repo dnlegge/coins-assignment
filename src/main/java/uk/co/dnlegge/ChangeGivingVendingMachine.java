@@ -12,16 +12,26 @@ public class ChangeGivingVendingMachine implements VendingMachine {
             return Collections.emptyList();
         }
         final ArrayList<Coin> coins = new ArrayList<>();
-        int runningTotal = pence;
+        int runningTotal = 0;
 
-        while (runningTotal > 0) {
-            Coin thisCoin = Coin.ONE_PENNY;
+        while (runningTotal < pence) {
+            Coin thisCoin = selectLargestCoinPossible(pence - runningTotal);
 
             coins.add(thisCoin);
-            runningTotal -= thisCoin.getDenomination();
+            runningTotal += thisCoin.getDenomination();
         }
 
         return coins;
+    }
+
+    private Coin selectLargestCoinPossible(int runningTotal) {
+        final Coin[] values = Coin.values();
+        for (Coin coin : values) {
+            if (coin.getDenomination() <= runningTotal) {
+                return coin;
+            }
+        }
+        throw new RuntimeException("No acceptable coin found");
     }
 
 }

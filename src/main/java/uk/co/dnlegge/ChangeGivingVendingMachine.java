@@ -17,7 +17,7 @@ public class ChangeGivingVendingMachine implements VendingMachine {
     private static final String COIN_INVENTORY_PROPERTIES = "coin-inventory.properties";
     private final String pathToInventory;
 
-    private Map<Integer, Integer> availableCoins;
+    private Map<Coin, Integer> availableCoins;
 
     public ChangeGivingVendingMachine(String pathToInventory) throws IOException {
         this.pathToInventory = pathToInventory;
@@ -26,7 +26,7 @@ public class ChangeGivingVendingMachine implements VendingMachine {
         availableCoins = new HashMap<>();
         for (String line : lines) {
             final String[] split = line.split("=");
-            availableCoins.put(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+            availableCoins.put(Coin.getByDemonination(split[0]), Integer.parseInt(split[1]));
         }
     }
 
@@ -63,10 +63,10 @@ public class ChangeGivingVendingMachine implements VendingMachine {
     private void writeOutAvailableCoinage() {
         StringBuilder fileContents = new StringBuilder();
         for (Coin coin : Coin.values()) {
-            if (availableCoins.containsKey(coin.getDenomination())) {
+            if (availableCoins.containsKey(coin)) {
                 fileContents.append(coin.getDenomination())
                         .append("=")
-                        .append(availableCoins.get(coin.getDenomination()))
+                        .append(availableCoins.get(coin))
                         .append("\n");
             }
 
@@ -107,10 +107,10 @@ public class ChangeGivingVendingMachine implements VendingMachine {
     }
 
     private boolean isAvailable(Coin coin) {
-        if (availableCoins.containsKey(coin.getDenomination())) {
-            final Integer availability = availableCoins.get(coin.getDenomination());
+        if (availableCoins.containsKey(coin)) {
+            final Integer availability = availableCoins.get(coin);
             if (availability > 0) {
-                availableCoins.put(coin.getDenomination(), availability - 1);
+                availableCoins.put(coin, availability - 1);
                 return true;
             }
         }

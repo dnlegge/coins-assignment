@@ -18,6 +18,16 @@ public enum Coin {
         this.denomination = denomination;
     }
 
+    public static Coin getByDemonination(String denominationString) {
+        final int value = Integer.parseInt(denominationString);
+        for (Coin coin : values()) {
+            if (value == coin.getDenomination()) {
+                return coin;
+            }
+        }
+        throw new IllegalArgumentException("No such coin of demonination " + denominationString);
+    }
+
     public String getName() {
         return name();
     }
@@ -33,5 +43,4 @@ public enum Coin {
     public String getDenominationString() {
         return denomination + "p";
     }
-
 }

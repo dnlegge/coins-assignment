@@ -3,13 +3,14 @@ package uk.co.dnlegge;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class ChangeGivingVendingMachineTest {
+public class InfiniteChangeGivingVendingMachineTest {
 
     private ChangeGivingVendingMachine beingTested;
 
@@ -91,5 +92,64 @@ public class ChangeGivingVendingMachineTest {
         return total;
     }
 
+    @Test
+    public void testGetChangeWithNo20ps() throws Exception {
+
+        final int testValue = 44;
+        final Collection<Coin> result = beingTested.getChangeFor(testValue);
+
+        assertNotNull(result);
+        assertNotEquals(0, result.size());
+
+        int total = getTotalAndPrintContents(result);
+
+        assertEquals(testValue, total);
+        //actual 10p 10p 10p 10p 2p 2p
+        assertEquals(6, result.size());
+
+    }
+
+    @Test
+    public void testGetChangeForLargeAmount() throws Exception {
+
+        final int testValue = 799;
+        final Collection<Coin> result = beingTested.getChangeFor(testValue);
+
+        assertNotNull(result);
+        assertNotEquals(0, result.size());
+
+        int total = getTotalAndPrintContents(result);
+
+        assertEquals(testValue, total);
+        //actual 100p 100p 100p 100p 100p 100p 100p 50p 10p 10p 10p 10p 5p 2p 2p
+        assertEquals(15, result.size());
+
+    }
+
+    @Test
+    public void testGetChangeForLargerAmount() throws Exception {
+
+        final int testValue = 1599;
+        final Collection<Coin> result = beingTested.getChangeFor(testValue);
+
+        assertNotNull(result);
+        assertNotEquals(0, result.size());
+
+        int total = getTotalAndPrintContents(result);
+
+        assertEquals(testValue, total);
+        //actual 100p 100p 100p 100p 100p 100p 100p 100p 100p 100p 100p 50p 50p 50p 50p 50p 50p 50p 50p 50p 10p 10p 10p 10p 5p 2p 2p
+        assertEquals(27, result.size());
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testNotEnoughCoinsInTheWorld() throws Exception {
+
+        final int testValue = 15999754;
+        beingTested.getChangeFor(testValue);
+
+        fail("Should have run out of coins");
+    }
 
 }

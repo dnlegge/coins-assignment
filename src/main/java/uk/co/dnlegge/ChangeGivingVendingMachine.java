@@ -27,6 +27,9 @@ public class ChangeGivingVendingMachine implements VendingMachine {
         this.availableCoins = new HashMap<>();
         for (String line : lines) {
             final String[] split = line.split("=");
+            if (split.length != 2) {
+                throw new IllegalArgumentException("Error reading in line of " + COIN_INVENTORY_PROPERTIES + " file: " + line);
+            }
             availableCoins.put(Coin.getByDemonination(split[0]), Integer.parseInt(split[1]));
         }
     }
